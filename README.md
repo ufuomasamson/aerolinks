@@ -50,8 +50,8 @@ A modern, full-stack flight booking application built with Next.js, Supabase, an
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/ufuomasamson/skysaver.git
-cd skysaver
+git clone https://github.com/ufuomasamson/aerolink.git
+cd aerolink
 ```
 
 ### 2. Install Dependencies

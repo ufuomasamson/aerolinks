@@ -1,4 +1,4 @@
--- Supabase Schema for Mazo Airways Application
+-- Supabase Schema for Aero Link Application
 
 -- Enable Row Level Security (RLS) for all tables
 -- This is a Supabase security feature

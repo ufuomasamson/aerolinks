@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'SkySaver Travels - Book Your Next Adventure',
+  title: 'Aero Link - Book Your Next Adventure',
   description: 'Book flights, track your journey, and manage your travel with ease',
 };
 

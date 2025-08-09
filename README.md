@@ -1,4 +1,4 @@
-# 🛫 Mazo Airways
+# 🛫 Aero Link
 
 A modern, full-stack flight booking application built with Next.js, Supabase, and Paystack, Crypto payment integration.
 

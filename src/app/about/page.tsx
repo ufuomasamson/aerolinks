@@ -4,7 +4,7 @@ export default function AboutPage() {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-[#18176b] to-[#18176b]/90 text-white py-20">
         <div className="max-w-4xl mx-auto text-center px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">About SkySaver Travels</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">About Aero Link</h1>
           <p className="text-xl">Your trusted partner in air travel, making journeys memorable and seamless</p>
         </div>
       </section>
@@ -17,13 +17,13 @@ export default function AboutPage() {
             <div>
               <h2 className="text-3xl font-bold text-[#18176b] mb-6">About Us</h2>
               <p className="text-lg text-gray-700 mb-4">
-                SkySaver Travels is a dynamic flight booking agency committed to making air travel affordable, 
+                Aero Link is a dynamic flight booking agency committed to making air travel affordable, 
                 convenient, and stress-free for everyone. We specialize in offering competitive airline ticket 
                 prices, exclusive travel deals, and personalized customer service to travelers across the globe.
               </p>
               <p className="text-lg text-gray-700 mb-6">
                 Whether you're planning a family vacation, a last-minute business trip, or a dream adventure abroad, 
-                SkySaver Travels ensures you fly smart — and save big.
+                Aero Link ensures you fly smart — and save big.
               </p>
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center p-4 bg-white rounded-lg shadow-md">
@@ -41,7 +41,7 @@ export default function AboutPage() {
               </div>
             </div>
             <div className="bg-gradient-to-br from-[#18176b] to-[#cd7e0f] p-8 rounded-xl text-white shadow-lg">
-              <h3 className="text-2xl font-bold mb-4">Why Choose SkySaver Travels?</h3>
+              <h3 className="text-2xl font-bold mb-4">Why Choose Aero Link?</h3>
               <ul className="space-y-3">
                 <li className="flex items-center gap-3">
                   <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
@@ -167,9 +167,9 @@ export default function AboutPage() {
               <h2 className="text-2xl font-bold text-[#18176b] mb-6">Contact Info</h2>
               <div className="space-y-4">
                 <p className="text-gray-700">📞 Phone: +13349484877</p>
-                <p className="text-gray-700">📧 Email: contact.skysaver@swtb.online</p>
-                <p className="text-gray-700">🌍 Website: www.skysaver.vercel.app</p>
-                <p className="text-gray-700">📱 Socials: @SkySaverTravels</p>
+                        <p className="text-gray-700">📧 Email: contact.aerolink@swtb.online</p>
+        <p className="text-gray-700">🌍 Website: www.aerolink.vercel.app</p>
+        <p className="text-gray-700">📱 Socials: @AeroLinkTravels</p>
                 <p className="text-gray-700 text-sm">(Facebook | Instagram | Twitter | LinkedIn)</p>
               </div>
             </div>
@@ -179,7 +179,7 @@ export default function AboutPage() {
         {/* Contact CTA */}
         <section className="bg-gradient-to-r from-[#18176b] to-[#18176b]/90 text-white p-8 rounded-xl text-center shadow-lg">
           <h2 className="text-2xl font-bold mb-4">Ready to Start Your Journey?</h2>
-          <p className="mb-6">Join thousands of satisfied customers who trust SkySaver Travels for their travel needs.</p>
+          <p className="mb-6">Join thousands of satisfied customers who trust Aero Link for their travel needs.</p>
           <div className="flex gap-4 justify-center">
             <a href="/search" className="bg-[#cd7e0f] text-white px-6 py-3 rounded-lg hover:bg-[#cd7e0f]/90 transition-colors duration-300">
               Search Flights

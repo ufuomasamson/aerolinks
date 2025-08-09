@@ -5,7 +5,7 @@ export async function GET() {
   try {
     // Create Supabase client with admin rights to execute SQL
     const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://dderjvlsbmjpuptiqlhx.supabase.co',
+      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://xmzqenwntbdlcskkleim.supabase.co',
       process.env.SUPABASE_SERVICE_ROLE_KEY || ''
     );
 

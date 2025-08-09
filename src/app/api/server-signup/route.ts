@@ -3,8 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase on the server side
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://gxkuydbwmsyxoqaagftg.supabase.co',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiYXBpeHZoZ2lhd3dzbG5vaXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMzMDY5MDIsImV4cCI6MjA2ODg4MjkwMn0.uPPoUnLmHfQQOz7OfiwONZEGdjdBubVXJB5zghxdUx8'
+  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://xmzqenwntbdlcskkleim.supabase.co',
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhtenFlbndudGJkbGNza2tsZWltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3NjQ3ODksImV4cCI6MjA3MDM0MDc4OX0.9BLSC23oiLGYZohnvY6H0G2kJc3AV9mLz4SyHnJ8pJ0'
 );
 
 export async function POST(request: Request) {

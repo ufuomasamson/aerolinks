@@ -20,8 +20,8 @@ export default function AuthForm() {
 
     try {
       if (isSignUp) {
-        // Sign up with Supabase
-        const { error: signUpError } = await supabase.auth.signUp({
+        // Step 1: Sign up with Supabase
+        const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -34,8 +34,37 @@ export default function AuthForm() {
         
         if (signUpError) throw signUpError;
         
-        setSuccess('Account created successfully! Check your email to confirm your account.');
-        setIsSignUp(false);
+        // Step 2: Immediately sign in the user (bypassing email verification)
+        if (data.user) {
+          try {
+            const { error: signInError } = await supabase.auth.signInWithPassword({
+              email,
+              password
+            });
+            
+            if (signInError) {
+              console.error("Auto signin error:", signInError);
+              setSuccess('Account created successfully! Please log in manually.');
+              setIsSignUp(false);
+              setLoading(false);
+              return;
+            }
+            
+            // Success! User is now signed in
+            setSuccess('Account created and signed in successfully! Redirecting...');
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 2000);
+            
+          } catch (signinErr) {
+            console.error("Unexpected signin error:", signinErr);
+            setSuccess('Account created successfully! Please log in manually.');
+            setIsSignUp(false);
+          }
+        } else {
+          setSuccess('Account created successfully! Please log in manually.');
+          setIsSignUp(false);
+        }
       } else {
         // Sign in with Supabase
         const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -59,21 +88,9 @@ export default function AuthForm() {
 
   return (
     <div className="auth-container bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-      <h2 className="text-2xl font-bold mb-6 text-center">
-        {isSignUp ? 'Create an Account' : 'Sign In'}
+      <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">
+        {isSignUp ? 'Create Account' : 'Sign In'}
       </h2>
-      
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
-          {error}
-        </div>
-      )}
-      
-      {success && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4">
-          {success}
-        </div>
-      )}
       
       <form onSubmit={handleAuth} className="space-y-4">
         {isSignUp && (
@@ -85,7 +102,8 @@ export default function AuthForm() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter your full name"
               required={isSignUp}
             />
           </div>
@@ -99,7 +117,8 @@ export default function AuthForm() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Enter your email"
             required
           />
         </div>
@@ -112,27 +131,39 @@ export default function AuthForm() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Enter your password"
             required
           />
         </div>
         
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+            {error}
+          </div>
+        )}
+        
+        {success && (
+          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md text-sm">
+            {success}
+          </div>
+        )}
+        
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
+          className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {loading ? 'Processing...' : isSignUp ? 'Sign Up' : 'Sign In'}
+          {loading ? 'Processing...' : (isSignUp ? 'Create Account' : 'Sign In')}
         </button>
       </form>
       
-      <div className="mt-4 text-center">
+      <div className="mt-6 text-center">
         <button
-          type="button"
           onClick={() => setIsSignUp(!isSignUp)}
-          className="text-blue-600 hover:underline"
+          className="text-blue-600 hover:text-blue-800 text-sm font-medium"
         >
-          {isSignUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up'}
+          {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
         </button>
       </div>
     </div>

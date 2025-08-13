@@ -21,7 +21,7 @@ export default function DirectSignupPage() {
     setDebugInfo(null);
 
     try {
-      // Step 1: Use the Supabase REST API directly
+      // Step 1: Use the Supabase REST API directly for signup
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://xmzqenwntbdlcskkleim.supabase.co';
       const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhtenFlbndudGJkbGNza2tsZWltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3NjQ3ODksImV4cCI6MjA3MDM0MDc4OX0.9BLSC23oiLGYZohnvY6H0G2kJc3AV9mLz4SyHnJ8pJ0';
       
@@ -55,140 +55,154 @@ export default function DirectSignupPage() {
         throw new Error(signupData.error_description || signupData.error || "Signup failed");
       }
       
-      setSuccess("Account created successfully! You can now log in.");
-      setTimeout(() => {
-        router.push("/login");
-      }, 2000);
-    } catch (err) {
+      console.log("Signup successful:", signupData);
+      
+      // Step 2: Immediately sign in the user (bypassing email verification)
+      try {
+        console.log("Attempting auto signin after signup");
+        
+        const signinResponse = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': supabaseAnonKey,
+            'Authorization': `Bearer ${supabaseAnonKey}`
+          },
+          body: JSON.stringify({
+            email,
+            password
+          })
+        });
+        
+        const signinData = await signinResponse.json();
+        
+        setDebugInfo(prev => ({
+          ...prev,
+          signinStatus: signinResponse.status,
+          signinData
+        }));
+        
+        if (signinResponse.ok && signinData.access_token) {
+          console.log("Auto signin successful:", signinData);
+          
+          // Success! User is now signed in
+          setSuccess("Account created and signed in successfully! Redirecting...");
+          setTimeout(() => {
+            window.location.href = "/search";
+          }, 2000);
+        } else {
+          console.error("Auto signin failed:", signinData);
+          setSuccess("Account created successfully! Please log in manually.");
+          setTimeout(() => {
+            router.push("/login");
+          }, 2000);
+        }
+        
+      } catch (signinErr) {
+        console.error("Unexpected signin error:", signinErr);
+        setSuccess("Account created successfully! Please log in manually.");
+        setTimeout(() => {
+          router.push("/login");
+        }, 2000);
+      }
+      
+    } catch (err: any) {
       console.error("Signup error:", err);
-      setError(err instanceof Error ? err.message : "An unexpected error occurred");
+      setError(err.message || "Registration failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create your account (Direct Method)
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Try our simplified signup process
-          </p>
-        </div>
-
-        {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 my-4">
-            <p className="text-sm text-red-700">{error}</p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
+      <div className="max-w-md w-full">
+        <div className="bg-white rounded-lg shadow-xl p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-[#18176b] mb-2">Direct Signup</h1>
+            <p className="text-gray-600">Create account using direct API calls</p>
           </div>
-        )}
-
-        {success && (
-          <div className="bg-green-50 border-l-4 border-green-500 p-4 my-4">
-            <p className="text-sm text-green-700">{success}</p>
-          </div>
-        )}
-
-        <form className="mt-8 space-y-6" onSubmit={handleSignup}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div className="mb-4">
-              <label htmlFor="full-name" className="sr-only">
+          
+          <form onSubmit={handleSignup} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Full Name
               </label>
               <input
-                id="full-name"
-                name="fullName"
                 type="text"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Full Name"
+                placeholder="Enter your full name"
                 value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                onChange={e => setFullName(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cd7e0f] focus:border-[#cd7e0f] transition text-gray-900"
+                required
               />
             </div>
-            <div className="mb-4">
-              <label htmlFor="email-address" className="sr-only">
-                Email address
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
               </label>
               <input
-                id="email-address"
-                name="email"
                 type="email"
-                autoComplete="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
+                placeholder="Enter your email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={e => setEmail(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cd7e0f] focus:border-[#cd7e0f] transition text-gray-900"
+                required
               />
             </div>
+            
             <div>
-              <label htmlFor="password" className="sr-only">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Password
               </label>
               <input
-                id="password"
-                name="password"
                 type="password"
-                autoComplete="new-password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Password (min. 6 characters)"
+                placeholder="Create a password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cd7e0f] focus:border-[#cd7e0f] transition text-gray-900"
+                required
               />
             </div>
-          </div>
-
-          <div>
+            
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                {error}
+              </div>
+            )}
+            
+            {success && (
+              <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+                {success}
+              </div>
+            )}
+            
             <button
               type="submit"
+              className="w-full bg-[#cd7e0f] text-white py-3 rounded-lg font-semibold hover:bg-[#cd7e0f]/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              {loading ? "Creating account..." : "Sign up"}
+              {loading ? "Creating Account..." : "Create Account"}
             </button>
-          </div>
+          </form>
           
-          <div className="flex justify-between text-sm mt-4">
-            <a href="/signup" className="text-blue-600 hover:text-blue-800">
-              Try standard signup
-            </a>
-            <a href="/login" className="text-blue-600 hover:text-blue-800">
-              Back to login
-            </a>
-          </div>
-        </form>
-        
-        {/* Debug information */}
-        {debugInfo && (
-          <div className="mt-8 border-t pt-4">
-            <h3 className="text-sm font-medium text-gray-500">Debug Information</h3>
-            <pre className="mt-2 bg-gray-50 p-3 rounded text-xs overflow-auto max-h-60">
-              {JSON.stringify(debugInfo, null, 2)}
-            </pre>
-          </div>
-        )}
-        
-        <div className="mt-6 border-t pt-4">
-          <p className="text-xs text-gray-500 mb-1">Troubleshooting</p>
-          <div className="flex flex-col space-y-2">
-            <a 
-              href="/debug" 
-              className="text-xs text-blue-600 hover:text-blue-800"
-              target="_blank"
-            >
-              Open Supabase Debug Page
-            </a>
-            <a 
-              href="/api/fix-database" 
-              className="text-xs text-blue-600 hover:text-blue-800"
-              target="_blank"
-            >
-              Fix Database Schema
-            </a>
+          {debugInfo && (
+            <div className="mt-6 p-4 bg-gray-100 rounded-lg">
+              <h3 className="font-semibold mb-2">Debug Info:</h3>
+              <pre className="text-xs overflow-auto">
+                {JSON.stringify(debugInfo, null, 2)}
+              </pre>
+            </div>
+          )}
+          
+          <div className="mt-6 text-center">
+            <p className="text-gray-600">
+              Already have an account?{" "}
+              <a href="/login" className="text-[#cd7e0f] hover:text-[#cd7e0f]/90 font-semibold">
+                Sign in here
+              </a>
+            </p>
           </div>
         </div>
       </div>

@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-// TODO: Replace Supabase logic with MySQL-based registration using API route
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -38,41 +37,65 @@ export default function SignupPage() {
       const { supabase } = await import('@/lib/supabaseClient');
       console.log("Signing up with Supabase directly from client");
       
-      // Try a simpler signup approach without metadata
-      // This avoids potential database schema issues
-      const { data, error } = await supabase.auth.signUp({
+      // Step 1: Sign up the user
+      const { data: signupData, error: signupError } = await supabase.auth.signUp({
         email,
-        password
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            role: 'user'
+          }
+        }
       });
       
-      // We'll update the user metadata separately if signup succeeds
-      console.log("Using simplified signup without metadata");
-      
-      if (error) {
-        console.error("Supabase signup error:", error);
-        setError(error.message || "Registration failed");
+      if (signupError) {
+        console.error("Supabase signup error:", signupError);
+        setError(signupError.message || "Registration failed");
         setLoading(false);
         return;
       }
       
-      console.log("Signup successful:", data);
+      console.log("Signup successful:", signupData);
       
-      // If signup was successful and we have a user ID, try to update metadata
-      if (data.user?.id) {
+      // Step 2: Immediately sign in the user (bypassing email verification)
+      if (signupData.user?.id) {
         try {
-          // Call our API to update user metadata
-          const metadataResponse = await fetch("/api/update-user-metadata", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-              userId: data.user.id,
-              fullName: fullName 
-            }),
+          const { data: signinData, error: signinError } = await supabase.auth.signInWithPassword({
+            email,
+            password
           });
           
-          console.log("Metadata update response:", await metadataResponse.json());
+          if (signinError) {
+            console.error("Auto signin error:", signinError);
+            // Even if auto signin fails, signup was successful
+            setSuccess("Account created successfully! Please log in manually.");
+            setTimeout(() => {
+              router.push("/login");
+            }, 2000);
+            setLoading(false);
+            return;
+          }
           
-          // Set user cookie for server components
+          console.log("Auto signin successful:", signinData);
+          
+          // Step 3: Update user metadata if needed
+          try {
+            const metadataResponse = await fetch("/api/update-user-metadata", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ 
+                userId: signinData.user.id,
+                fullName: fullName 
+              }),
+            });
+            
+            console.log("Metadata update response:", await metadataResponse.json());
+          } catch (metadataError) {
+            console.warn("Couldn't update user metadata, but signup succeeded:", metadataError);
+          }
+          
+          // Step 4: Set user cookie for server components
           try {
             const cookieResponse = await fetch('/api/set-user-cookie', {
               method: 'POST',
@@ -82,7 +105,7 @@ export default function SignupPage() {
               body: JSON.stringify({ 
                 session: {
                   user: {
-                    ...data.user,
+                    ...signinData.user,
                     user_metadata: { full_name: fullName, role: 'user' }
                   }
                 } 
@@ -97,17 +120,26 @@ export default function SignupPage() {
           } catch (cookieError) {
             console.error('Error setting user cookie:', cookieError);
           }
-        } catch (metadataError) {
-          // Log but don't fail if metadata update fails
-          console.warn("Couldn't update user metadata, but signup succeeded:", metadataError);
+          
+          // Success! User is now signed in
+          setSuccess("Account created and signed in successfully! Redirecting...");
+          setTimeout(() => {
+            window.location.href = "/search";
+          }, 2000);
+          
+        } catch (signinErr) {
+          console.error("Unexpected signin error:", signinErr);
+          setSuccess("Account created successfully! Please log in manually.");
+          setTimeout(() => {
+            router.push("/login");
+          }, 2000);
         }
+      } else {
+        setError("Signup succeeded but no user ID returned");
       }
       
-      setSuccess("Account created successfully! Redirecting to dashboard...");
-      setTimeout(() => {
-        window.location.href = "/search";
-      }, 2000);
     } catch (err) {
+      console.error("Unexpected error:", err);
       setError("An unexpected error occurred");
     }
 

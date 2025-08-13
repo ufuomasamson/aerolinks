@@ -55,7 +55,7 @@ export async function signUp(
   name: string
 ) {
   try {
-    // Create the user account
+    // Step 1: Create the user account
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -69,18 +69,52 @@ export async function signUp(
     
     if (error) throw error;
     
-    // Create a record in user_roles table
+    // Step 2: Immediately sign in the user (bypassing email verification)
+    let session = null;
     if (data.user) {
-      await supabase
-        .from(TABLES.USER_ROLES)
-        .insert({
-          user_id: data.user.id,
-          role: 'user',
-          created_at: new Date().toISOString()
+      try {
+        const { data: signinData, error: signinError } = await supabase.auth.signInWithPassword({
+          email,
+          password
         });
+        
+        if (signinError) {
+          console.error("Auto signin error:", signinError);
+          // Even if auto signin fails, signup was successful
+          return { 
+            success: true, 
+            message: "Account created successfully. Please log in manually.",
+            requiresManualLogin: true
+          };
+        }
+        
+        console.log("Auto signin successful:", signinData);
+        session = signinData.session;
+        
+        // Create a record in user_roles table
+        await supabase
+          .from(TABLES.USER_ROLES)
+          .insert({
+            user_id: data.user.id,
+            role: 'user',
+            created_at: new Date().toISOString()
+          });
+        
+      } catch (signinErr) {
+        console.error("Unexpected signin error:", signinErr);
+        return { 
+          success: true, 
+          message: "Account created successfully. Please log in manually.",
+          requiresManualLogin: true
+        };
+      }
     }
     
-    return { success: true };
+    return { 
+      success: true, 
+      session: session,
+      message: "Account created and signed in successfully"
+    };
   } catch (error: any) {
     return {
       success: false,

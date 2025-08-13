@@ -28,53 +28,43 @@ export default function TicketPage() {
         
         const userId = session.user.id;
         
-        // Use Supabase to fetch booking data
-        const bookingsList = await databases.listDocuments(
-          DATABASE_ID,
-          COLLECTIONS.BOOKINGS,
-          [
-            Query.equal("user_id", userId),
-            Query.equal("payment_status", "paid"),
-            Query.orderDesc("payment_date"),
-            Query.limit(1)
-          ]
-        );
+        // Use Supabase to fetch booking data with flight and airline information
+        const { data: bookings, error: bookingError } = await supabase
+          .from(TABLES.BOOKINGS)
+          .select(`
+            *,
+            flights:flight_id (
+              id,
+              flight_number,
+              departure_location_id,
+              arrival_location_id,
+              date,
+              time,
+              price,
+              trip,
+              tour_type,
+              passenger_class,
+              departure_location:locations!flights_departure_location_id_fkey(city, country),
+              arrival_location:locations!flights_arrival_location_id_fkey(city, country),
+              airline:airlines(id, name, logo_url)
+            )
+          `)
+          .eq('user_id', userId)
+          .eq('paid', true)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
         
-        const booking = bookingsList.documents[0];
-        
-        if (!booking) {
+        if (bookingError || !bookings) {
           throw new Error("No paid booking found");
         }
         
-        // Get the flight information
-        const flight = await databases.getDocument(
-          DATABASE_ID,
-          COLLECTIONS.FLIGHTS,
-          booking.flight_id
-        );
-        
-        // Get airline information
-        const airline = await databases.getDocument(
-          DATABASE_ID,
-          COLLECTIONS.AIRLINES,
-          flight.airline_id
-        );
-        
-        // Combine the data for compatibility with existing component
-        const bookingData = {
-          ...booking,
-          flights: {
-            ...flight,
-            airline: airline
-          }
-        };
-          
         // Set the booking data
-        setBooking(bookingData);
+        setBooking(bookings);
         
         // Fetch airline logo if available
-        if (airline && airline.logo_url) {
-          setAirlineLogo(airline.logo_url);
+        if (bookings.flights?.airline?.logo_url) {
+          setAirlineLogo(bookings.flights.airline.logo_url);
         } else {
           setAirlineLogo("/globe.svg"); // fallback logo
         }
@@ -88,6 +78,10 @@ export default function TicketPage() {
     fetchTicket();
   }, []);
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   if (loading) {
     return <div className="flex justify-center items-center min-h-[60vh]">Loading ticket...</div>;
   }
@@ -100,25 +94,42 @@ export default function TicketPage() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 py-8 px-2">
       <FlightTicket
         ref={ticketRef}
-        passengerName={booking.passenger_name}
-        flightNumber={booking.flights?.flight_number || "-"}
-        airlineName={booking.flights?.airline?.name || "-"}
+        passengerName={booking.passenger_name || "N/A"}
+        flightNumber={booking.flights?.flight_number || "N/A"}
+        airlineName={booking.flights?.airline?.name || "N/A"}
         airlineLogo={airlineLogo}
-        departure={booking.flights?.departure_city || "-"}
-        arrival={booking.flights?.arrival_city || "-"}
-        date={booking.flights?.date || "-"}
-        time={booking.flights?.time || "-"}
+        departure={booking.flights?.departure_location?.city || "N/A"}
+        arrival={booking.flights?.arrival_location?.city || "N/A"}
+        date={booking.flights?.date || "N/A"}
+        time={booking.flights?.time || "N/A"}
         trackingNumber={booking.tracking_number || booking.id}
-        trip={booking.flights?.trip || "-"}
-        tourtype={booking.flights?.tour_type || "-"}
-        passengerclass={booking.passenger_class || "Economy"}
+        trip={booking.flights?.trip || "One-way"}
+        tourtype={booking.flights?.tour_type || "Economy"}
+        passengerclass={booking.flights?.passenger_class || "Economy"}
       />
-      <button
-        onClick={() => downloadTicket(ticketRef)}
-        className="mt-4 px-6 py-2 bg-[#18176b] text-white rounded-lg font-semibold shadow hover:bg-[#1f1e89] transition"
-      >
-        Download Ticket
-      </button>
+      
+      {/* Action Buttons */}
+      <div className="mt-6 flex gap-4">
+        <button
+          onClick={() => downloadTicket(ticketRef)}
+          className="px-6 py-2 bg-[#18176b] text-white rounded-lg font-semibold shadow hover:bg-[#1f1e89] transition"
+        >
+          Download PDF
+        </button>
+        
+        <button
+          onClick={handlePrint}
+          className="px-6 py-2 bg-green-600 text-white rounded-lg font-semibold shadow hover:bg-green-700 transition"
+        >
+          Print Ticket
+        </button>
+      </div>
+      
+      {/* Instructions */}
+      <div className="mt-4 text-center text-sm text-gray-600 max-w-md">
+        <p>💡 <strong>Tip:</strong> If PDF download doesn't work properly, use the Print button instead. 
+        You can then save as PDF from your browser's print dialog.</p>
+      </div>
     </div>
   );
 } 

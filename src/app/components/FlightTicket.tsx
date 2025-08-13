@@ -19,7 +19,6 @@ const FlightTicket = forwardRef<HTMLDivElement, FlightTicketProps>(({
   passengerName,
   flightNumber,
   airlineName,
-  airlineLogo,
   departure,
   arrival,
   date,
@@ -35,243 +34,188 @@ const FlightTicket = forwardRef<HTMLDivElement, FlightTicketProps>(({
       id="ticket" 
       className="ticket-container"
       style={{ 
-        width: '100%',
-        maxWidth: '1000px',
-        margin: '0 auto', 
-        backgroundColor: '#ffffff', 
-        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)', 
-        borderRadius: '12px', 
-        padding: '0',
-        border: '2px solid #e5e7eb',
+        display: 'flex',
+        backgroundColor: '#0052b3',
+        color: 'white',
+        borderRadius: '12px',
+        overflow: 'hidden',
+        width: '1100px',
+        maxWidth: '100%',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
         fontFamily: 'Arial, sans-serif',
-        fontSize: '14px',
-        lineHeight: '1.4',
-        overflow: 'hidden'
+        margin: '0 auto'
       }}
     >
-      {/* Header Section */}
+      {/* Left Section - Main Ticket */}
       <div style={{ 
-        backgroundColor: '#18176b',
-        color: 'white',
-        padding: '20px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
+        flex: '3',
+        padding: '30px 40px',
+        position: 'relative'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <img 
-            src={airlineLogo} 
-            alt="Airline Logo" 
-            style={{ 
-              height: '50px', 
-              width: '50px', 
-              objectFit: 'contain',
-              backgroundColor: 'white',
-              borderRadius: '8px',
-              padding: '5px'
-            }} 
-            crossOrigin="anonymous"
-          />
-          <div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '5px' }}>
-              {airlineName}
-            </div>
-            <div style={{ fontSize: '14px', opacity: '0.9' }}>
-              Flight {flightNumber}
-            </div>
-          </div>
-        </div>
-        
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: '12px', opacity: '0.8', marginBottom: '5px' }}>STATUS</div>
-          <div style={{ 
-            backgroundColor: '#10b981', 
-            color: 'white', 
-            padding: '8px 16px', 
-            borderRadius: '20px', 
-            fontSize: '14px', 
-            fontWeight: '600' 
-          }}>
-            CONFIRMED
-          </div>
-        </div>
-      </div>
-
-      {/* Main Ticket Content - Horizontal Layout */}
-      <div style={{ padding: '25px' }}>
-        {/* Route Information Row */}
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'space-between',
-          marginBottom: '25px',
-          padding: '20px',
-          backgroundColor: '#f8fafc',
-          borderRadius: '10px',
-          border: '1px solid #e2e8f0'
+        <h4 style={{ 
+          fontSize: '16px', 
+          margin: '0', 
+          fontWeight: 'bold',
+          textTransform: 'uppercase'
         }}>
-          {/* Departure */}
-          <div style={{ textAlign: 'center', flex: '1' }}>
-            <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px', fontWeight: '600', textTransform: 'uppercase' }}>
-              From
-            </div>
-            <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#111827', marginBottom: '5px' }}>
-              {departure}
-            </div>
-            <div style={{ fontSize: '12px', color: '#6b7280' }}>
-              Departure
-            </div>
-          </div>
-          
-          {/* Flight Arrow */}
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            margin: '0 30px'
-          }}>
-            <div style={{ fontSize: '24px', color: '#18176b', fontWeight: 'bold', marginBottom: '5px' }}>
-              ✈
-            </div>
-            <div style={{ 
-              width: '60px', 
-              height: '2px', 
-              backgroundColor: '#18176b',
-              position: 'relative'
-            }}>
-              <div style={{ 
-                position: 'absolute',
-                right: '0',
-                top: '-3px',
-                width: '0',
-                height: '0',
-                borderLeft: '8px solid #18176b',
-                borderTop: '4px solid transparent',
-                borderBottom: '4px solid transparent'
-              }}></div>
-            </div>
-          </div>
-          
-          {/* Arrival */}
-          <div style={{ textAlign: 'center', flex: '1' }}>
-            <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px', fontWeight: '600', textTransform: 'uppercase' }}>
-              To
-            </div>
-            <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#111827', marginBottom: '5px' }}>
-              {arrival}
-            </div>
-            <div style={{ fontSize: '12px', color: '#6b7280' }}>
-              Arrival
-            </div>
-          </div>
-        </div>
+          {passengerclass.toUpperCase()} CLASS
+        </h4>
+        
+        <h2 style={{ 
+          fontSize: '36px', 
+          margin: '10px 0', 
+          fontWeight: 'bold', 
+          color: '#ffcc00' 
+        }}>
+          {airlineName.toUpperCase()}
+        </h2>
+        
+        <p style={{ margin: '0', fontSize: '18px' }}>
+          Safe skies with us!
+        </p>
+
+        {/* Clouds */}
+        <svg style={{
+          position: 'absolute',
+          top: '30px',
+          left: '20px',
+          width: '100px',
+          opacity: '0.6'
+        }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 32" fill="#4680d1">
+          <ellipse cx="16" cy="16" rx="16" ry="10"/>
+          <ellipse cx="40" cy="16" rx="14" ry="10"/>
+          <ellipse cx="28" cy="12" rx="12" ry="8"/>
+        </svg>
+        
+        <svg style={{
+          position: 'absolute',
+          bottom: '40px',
+          right: '200px',
+          width: '120px',
+          opacity: '0.6'
+        }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 32" fill="#4680d1">
+          <ellipse cx="16" cy="16" rx="16" ry="10"/>
+          <ellipse cx="40" cy="16" rx="14" ry="10"/>
+          <ellipse cx="28" cy="12" rx="12" ry="8"/>
+        </svg>
+        
+        <svg style={{
+          position: 'absolute',
+          top: '120px',
+          right: '40px',
+          width: '80px',
+          opacity: '0.6'
+        }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 32" fill="#4680d1">
+          <ellipse cx="16" cy="16" rx="16" ry="10"/>
+          <ellipse cx="40" cy="16" rx="14" ry="10"/>
+          <ellipse cx="28" cy="12" rx="12" ry="8"/>
+        </svg>
+
+        {/* Airplane */}
+        <svg style={{
+          position: 'absolute',
+          top: '60px',
+          right: '150px',
+          width: '80px'
+        }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 32">
+          <path d="M2 16 L20 20 L50 10 L60 14 L50 18 L20 12 Z" fill="#fff"/>
+          <rect x="48" y="10" width="4" height="8" fill="#ff3333"/>
+          <rect x="12" y="14" width="4" height="8" fill="#ff3333"/>
+          <circle cx="26" cy="14" r="1" fill="#666"/>
+          <circle cx="30" cy="13" r="1" fill="#666"/>
+          <circle cx="34" cy="12" r="1" fill="#666"/>
+        </svg>
 
         {/* Flight Details Grid */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(3, 1fr)', 
-          gap: '20px',
-          marginBottom: '25px'
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '25px',
+          marginTop: '40px'
         }}>
-          {/* Date & Time */}
-          <div style={{ 
-            backgroundColor: '#f8fafc',
-            border: '1px solid #e2e8f0',
-            borderRadius: '8px',
-            padding: '15px',
-            textAlign: 'center'
-          }}>
-            <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px', fontWeight: '600', textTransform: 'uppercase' }}>
-              Date & Time
-            </div>
-            <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#111827', marginBottom: '5px' }}>
-              {date}
-            </div>
-            <div style={{ fontSize: '14px', color: '#6b7280' }}>
-              {time}
-            </div>
-          </div>
-
-          {/* Passenger Info */}
-          <div style={{ 
-            backgroundColor: '#f8fafc',
-            border: '1px solid #e2e8f0',
-            borderRadius: '8px',
-            padding: '15px',
-            textAlign: 'center'
-          }}>
-            <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px', fontWeight: '600', textTransform: 'uppercase' }}>
-              Passenger
-            </div>
-            <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#111827', marginBottom: '5px' }}>
+          <div style={{ fontSize: '14px', textTransform: 'uppercase', color: '#d6e4ff' }}>
+            PASSENGER NAME
+            <span style={{ display: 'block', fontSize: '18px', fontWeight: 'bold', color: 'white', marginTop: '5px' }}>
               {passengerName}
-            </div>
-            <div style={{ fontSize: '14px', color: '#6b7280' }}>
-              {passengerclass}
-            </div>
+            </span>
           </div>
-
-          {/* Trip Details */}
-          <div style={{ 
-            backgroundColor: '#f8fafc',
-            border: '1px solid #e2e8f0',
-            borderRadius: '8px',
-            padding: '15px',
-            textAlign: 'center'
-          }}>
-            <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px', fontWeight: '600', textTransform: 'uppercase' }}>
-              Trip Details
-            </div>
-            <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#111827', marginBottom: '5px' }}>
-              {trip}
-            </div>
-            <div style={{ fontSize: '14px', color: '#6b7280' }}>
-              {tourtype}
-            </div>
+          
+          <div style={{ fontSize: '14px', textTransform: 'uppercase', color: '#d6e4ff' }}>
+            DEPARTURE TIME
+            <span style={{ display: 'block', fontSize: '18px', fontWeight: 'bold', color: 'white', marginTop: '5px' }}>
+              {time}
+            </span>
           </div>
-        </div>
-
-        {/* Tracking Information */}
-        <div style={{ 
-          backgroundColor: '#f0f9ff',
-          border: '1px solid #0ea5e9',
-          borderRadius: '8px',
-          padding: '15px',
-          textAlign: 'center'
-        }}>
-          <div style={{ fontSize: '12px', color: '#0369a1', marginBottom: '8px', fontWeight: '600', textTransform: 'uppercase' }}>
-            Booking Reference
+          
+          <div style={{ fontSize: '14px', textTransform: 'uppercase', color: '#d6e4ff' }}>
+            SEAT NUMBER
+            <span style={{ display: 'block', fontSize: '18px', fontWeight: 'bold', color: 'white', marginTop: '5px' }}>
+              {passengerclass.charAt(0).toUpperCase()}26
+            </span>
           </div>
-          <div style={{ 
-            fontFamily: 'monospace', 
-            fontSize: '18px', 
-            color: '#18176b', 
-            fontWeight: '700',
-            letterSpacing: '2px'
-          }}>
-            {trackingNumber}
+          
+          <div style={{ fontSize: '14px', textTransform: 'uppercase', color: '#d6e4ff' }}>
+            FLIGHT NUMBER
+            <span style={{ display: 'block', fontSize: '18px', fontWeight: 'bold', color: 'white', marginTop: '5px' }}>
+              {flightNumber}
+            </span>
           </div>
-          <div style={{ fontSize: '12px', color: '#0369a1', marginTop: '5px' }}>
-            Please keep this reference for your records
+          
+          <div style={{ fontSize: '14px', textTransform: 'uppercase', color: '#d6e4ff' }}>
+            GOING FROM
+            <span style={{ display: 'block', fontSize: '18px', fontWeight: 'bold', color: 'white', marginTop: '5px' }}>
+              {departure.toUpperCase()}
+            </span>
+          </div>
+          
+          <div style={{ fontSize: '14px', textTransform: 'uppercase', color: '#d6e4ff' }}>
+            GOING TO
+            <span style={{ display: 'block', fontSize: '18px', fontWeight: 'bold', color: 'white', marginTop: '5px' }}>
+              {arrival.toUpperCase()}
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Footer */}
-      <div style={{ 
-        backgroundColor: '#f9fafb',
-        borderTop: '1px solid #e5e7eb',
-        padding: '15px 25px',
-        textAlign: 'center',
-        fontSize: '12px',
-        color: '#6b7280'
+      {/* Right Section - Stub */}
+      <div style={{
+        flex: '1.2',
+        backgroundColor: '#003a80',
+        padding: '30px',
+        borderLeft: '2px dashed #ffffff'
       }}>
-        <div style={{ marginBottom: '5px', fontWeight: '600' }}>
-          🎫 Aero Link - Your Trusted Travel Partner
-        </div>
-        <div style={{ fontStyle: 'italic' }}>
-          Please present this ticket at check-in • Valid ID required • Terms and conditions apply
-        </div>
+        <h3 style={{ fontSize: '12px', margin: '10px 0 2px', textTransform: 'uppercase', color: '#d6e4ff' }}>
+          PASSENGER NAME
+        </h3>
+        <p style={{ margin: '0', fontSize: '16px', fontWeight: 'bold' }}>
+          {passengerName}
+        </p>
+        
+        <h3 style={{ fontSize: '12px', margin: '10px 0 2px', textTransform: 'uppercase', color: '#d6e4ff' }}>
+          DEPARTURE TIME
+        </h3>
+        <p style={{ margin: '0', fontSize: '16px', fontWeight: 'bold' }}>
+          {time}
+        </p>
+        
+        <h3 style={{ fontSize: '12px', margin: '10px 0 2px', textTransform: 'uppercase', color: '#d6e4ff' }}>
+          FLIGHT NUMBER
+        </h3>
+        <p style={{ margin: '0', fontSize: '16px', fontWeight: 'bold' }}>
+          {flightNumber}
+        </p>
+        
+        <h3 style={{ fontSize: '12px', margin: '10px 0 2px', textTransform: 'uppercase', color: '#d6e4ff' }}>
+          {passengerclass.toUpperCase()} CLASS
+        </h3>
+        
+        {/* Barcode */}
+        <div style={{
+          marginTop: '30px',
+          background: 'repeating-linear-gradient(90deg, black, black 2px, white 2px, white 4px)',
+          height: '60px',
+          width: '100%'
+        }}></div>
       </div>
     </div>
   );

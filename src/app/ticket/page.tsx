@@ -8,7 +8,6 @@ import { downloadTicket } from "@/lib/downloadTicket";
 export default function TicketPage() {
   const [loading, setLoading] = useState(true);
   const [booking, setBooking] = useState<any>(null);
-  const [airlineLogo, setAirlineLogo] = useState<string>("");
   const [error, setError] = useState("");
   const router = useRouter();
   const ticketRef = useRef<HTMLDivElement>(null);
@@ -61,13 +60,6 @@ export default function TicketPage() {
         
         // Set the booking data
         setBooking(bookings);
-        
-        // Fetch airline logo if available
-        if (bookings.flights?.airline?.logo_url) {
-          setAirlineLogo(bookings.flights.airline.logo_url);
-        } else {
-          setAirlineLogo("/globe.svg"); // fallback logo
-        }
         setLoading(false);
       } catch (error) {
         console.error("Error fetching ticket:", error);
@@ -112,8 +104,7 @@ export default function TicketPage() {
         ref={ticketRef}
         passengerName={booking.passenger_name || "N/A"}
         flightNumber={booking.flights?.flight_number || "N/A"}
-        airlineName={booking.flights?.airline?.name || "N/A"}
-        airlineLogo={airlineLogo}
+        airlineName={booking.flights?.airline?.name || "AERO LINK"}
         departure={booking.flights?.departure_location?.city || "N/A"}
         arrival={booking.flights?.arrival_location?.city || "N/A"}
         date={booking.flights?.date || "N/A"}

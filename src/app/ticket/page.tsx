@@ -90,6 +90,22 @@ export default function TicketPage() {
   }
   if (!booking) return null;
 
+  // Format the data for better display
+  const formatTrip = (trip: string) => {
+    if (!trip) return "One Way";
+    return trip.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  };
+
+  const formatTourType = (tourType: string) => {
+    if (!tourType) return "Economy";
+    return tourType.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  };
+
+  const formatPassengerClass = (passengerClass: string) => {
+    if (!passengerClass) return "Economy";
+    return passengerClass.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 py-8 px-2">
       <FlightTicket
@@ -103,9 +119,9 @@ export default function TicketPage() {
         date={booking.flights?.date || "N/A"}
         time={booking.flights?.time || "N/A"}
         trackingNumber={booking.tracking_number || booking.id}
-        trip={booking.flights?.trip || "One-way"}
-        tourtype={booking.flights?.tour_type || "Economy"}
-        passengerclass={booking.flights?.passenger_class || "Economy"}
+        trip={formatTrip(booking.flights?.trip)}
+        tourtype={formatTourType(booking.flights?.tour_type)}
+        passengerclass={formatPassengerClass(booking.flights?.passenger_class)}
       />
       
       {/* Action Buttons */}

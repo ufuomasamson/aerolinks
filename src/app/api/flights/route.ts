@@ -59,7 +59,10 @@ export async function POST(req: NextRequest) {
       date,
       time,
       price,
-      passenger_name
+      passenger_name,
+      trip,
+      tour_type,
+      passenger_class
     } = body;
 
     console.log('Flight creation request body:', body);
@@ -98,6 +101,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'All fields including passenger name are required' }, { status: 400 });
     }
 
+    // Set default values for optional fields if not provided
+    const tripType = trip || 'one-way';
+    const tourType = tour_type || 'economy';
+    const passengerClass = passenger_class || 'economy';
+
     // Generate tracking number automatically
     const trackingNumber = Math.random().toString(36).substring(2, 10).toUpperCase();
     console.log('Generated tracking number:', trackingNumber);
@@ -114,7 +122,10 @@ export async function POST(req: NextRequest) {
         time,
         price,
         passenger_name,
-        tracking_number: trackingNumber
+        tracking_number: trackingNumber,
+        trip: tripType,
+        tour_type: tourType,
+        passenger_class: passengerClass
       })
       .select()
       .single();

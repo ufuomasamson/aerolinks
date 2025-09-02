@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "unitedair",
+  "name": "aerolink",
   "buildCommand": "npm run build",
   "installCommand": "npm install",
   "framework": "nextjs",
@@ -10,10 +10,13 @@
     }
   },
   "env": {
-    "MYSQL_HOST": "localhost",
-    "MYSQL_USER": "flightsdbuser",
-    "MYSQL_PASSWORD": "password123",
-    "MYSQL_DATABASE": "flights_db",
-    "NEXT_PUBLIC_BASE_URL": "https://unitedairline.vercel.app"
+    "NEXT_PUBLIC_BASE_URL": "https://aerolink.vercel.app"
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_SUPABASE_URL": "@next_public_supabase_url",
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@next_public_supabase_anon_key",
+      "SUPABASE_SERVICE_ROLE_KEY": "@supabase_service_role_key"
+    }
   }
 } 

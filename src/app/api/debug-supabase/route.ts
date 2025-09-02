@@ -8,7 +8,7 @@ export async function GET() {
 
     return NextResponse.json({
       status: "Connection test",
-      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL || "https://xmzqenwntbdlcskkleim.supabase.co",
+      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL || "https://hvjzlpambwkbqwsbxeym.supabase.co",
       supabaseKeyAvailable: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
       connectionTest: {
         success: !error,

@@ -1,15 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL environment variable');
-}
+// Use environment variables with fallbacks
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://hvjzlpambwkbqwsbxeym.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anpscGFtYndrYnF3c2J4ZXltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3NjU0ODksImV4cCI6MjA3MjM0MTQ4OX0.k8LL8nPZN47_wWh_TTO3VP-igr44HOAmh6Mn4lpLUzM';
 
-if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-  throw new Error('Missing NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable');
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase configuration');
 }
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 console.log('Initializing Supabase with URL:', supabaseUrl);
 console.log('Supabase key available:', !!supabaseAnonKey);
@@ -32,7 +29,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 // Create a server-side client (for use in API routes)
 export const createServerSupabaseClient = () => {
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anpscGFtYndrYnF3c2J4ZXltIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1Njc2NTQ4OSwiZXhwIjoyMDcyMzQxNDg5fQ.wWqQXMh2-wEf7fp3A2MYufXt97K1yXf2NB6Zknzbcdk';
   
   if (!serviceRoleKey) {
     console.warn('SUPABASE_SERVICE_ROLE_KEY is not set. Falling back to anon key for server operations.');

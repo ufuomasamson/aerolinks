@@ -40,7 +40,6 @@ export async function POST(req: NextRequest) {
     const wallet_address = formData.get('address') as string;
     const network = formData.get('network') as string;
     const qrFile = formData.get('qr_code') as File;
-    const user_email = formData.get('user_email') as string || '';
 
     if (!name || !wallet_address || !network) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -49,28 +48,32 @@ export async function POST(req: NextRequest) {
     // Handle QR code upload if provided
     let qr_code_url = '';
     if (qrFile && qrFile instanceof File) {
-      // Upload the file to Supabase Storage
-      const fileExt = qrFile.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-      const filePath = `${STORAGE_BUCKETS.CRYPTO_WALLETS}/${fileName}`;
-      
-      const { data: uploadData, error: uploadError } = await supabase
-        .storage
-        .from(STORAGE_BUCKETS.MAIN_BUCKET.split('/')[0])
-        .upload(filePath.replace(`${STORAGE_BUCKETS.MAIN_BUCKET.split('/')[0]}/`, ''), qrFile);
-      
-      if (uploadError) {
-        console.error('Error uploading QR code:', uploadError);
-        return NextResponse.json({ error: 'Failed to upload QR code' }, { status: 500 });
+      try {
+        // Upload the file to Supabase Storage
+        const fileExt = qrFile.name.split('.').pop() || 'png';
+        const fileName = `crypto_wallet_${Date.now()}_${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase
+          .storage
+          .from('unit-bucket')
+          .upload(`crypto_wallets/${fileName}`, qrFile);
+        
+        if (uploadError) {
+          console.error('Error uploading QR code:', uploadError);
+          return NextResponse.json({ error: 'Failed to upload QR code: ' + uploadError.message }, { status: 500 });
+        }
+        
+        // Get the public URL for the uploaded file
+        const { data: urlData } = supabase
+          .storage
+          .from('unit-bucket')
+          .getPublicUrl(`crypto_wallets/${fileName}`);
+        
+        qr_code_url = urlData.publicUrl;
+      } catch (uploadErr) {
+        console.error('Error in QR code upload process:', uploadErr);
+        return NextResponse.json({ error: 'Failed to upload QR code: ' + uploadErr.message }, { status: 500 });
       }
-      
-      // Get the public URL for the uploaded file
-      const { data: urlData } = supabase
-        .storage
-        .from(STORAGE_BUCKETS.MAIN_BUCKET.split('/')[0])
-        .getPublicUrl(filePath.replace(`${STORAGE_BUCKETS.MAIN_BUCKET.split('/')[0]}/`, ''));
-      
-      qr_code_url = urlData.publicUrl;
     }
 
     // Create the crypto wallet in Supabase
@@ -78,10 +81,9 @@ export async function POST(req: NextRequest) {
       .from(TABLES.CRYPTO_WALLETS)
       .insert({
         name,
-        wallet_address,
+        address: wallet_address,  // Use 'address' instead of 'wallet_address'
         network,
         qr_code_url,
-        // user_email field removed as it doesn't exist in the database
         created_at: new Date().toISOString()
       })
       .select()
@@ -89,7 +91,11 @@ export async function POST(req: NextRequest) {
 
     if (error) {
       console.error('Error creating crypto wallet:', error);
-      return NextResponse.json({ error: 'Failed to create crypto wallet' }, { status: 500 });
+      return NextResponse.json({ 
+        error: 'Failed to create crypto wallet', 
+        details: error.message,
+        code: error.code 
+      }, { status: 500 });
     }
 
     return NextResponse.json({

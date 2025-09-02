@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
     const payment_method = formData.get('payment_method') as string;
     const user_id = formData.get('user_id') as string;
     const user_email = formData.get('user_email') as string;
-    const proofFile = formData.get('payment_proof') as File;
+    const proofFile = formData.get('proofFile') as File;
     
     console.log('[DEBUG] POST /api/payments received:', {
       booking_id,
@@ -149,28 +149,32 @@ export async function POST(req: NextRequest) {
     // Handle payment proof upload if provided
     let payment_proof_url = '';
     if (proofFile && proofFile instanceof File) {
-      // Upload the file to Supabase Storage
-      const fileExt = proofFile.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-      const filePath = `${STORAGE_BUCKETS.PAYMENT_PROOFS}/${fileName}`;
-      
-      const { data: uploadData, error: uploadError } = await supabase
-        .storage
-        .from(STORAGE_BUCKETS.MAIN_BUCKET.split('/')[0])
-        .upload(filePath.replace(`${STORAGE_BUCKETS.MAIN_BUCKET.split('/')[0]}/`, ''), proofFile);
-      
-      if (uploadError) {
-        console.error('Error uploading payment proof:', uploadError);
-        return NextResponse.json({ error: 'Failed to upload payment proof' }, { status: 500 });
+      try {
+        // Upload the file to Supabase Storage
+        const fileExt = proofFile.name.split('.').pop() || 'jpg';
+        const fileName = `payment_proof_${Date.now()}_${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase
+          .storage
+          .from('unit-bucket')
+          .upload(`payment_proofs/${fileName}`, proofFile);
+        
+        if (uploadError) {
+          console.error('Error uploading payment proof:', uploadError);
+          return NextResponse.json({ error: 'Failed to upload payment proof: ' + uploadError.message }, { status: 500 });
+        }
+        
+        // Get the public URL for the uploaded file
+        const { data: urlData } = supabase
+          .storage
+          .from('unit-bucket')
+          .getPublicUrl(`payment_proofs/${fileName}`);
+        
+        payment_proof_url = urlData.publicUrl;
+      } catch (uploadErr) {
+        console.error('Error in payment proof upload process:', uploadErr);
+        return NextResponse.json({ error: 'Failed to upload payment proof: ' + uploadErr.message }, { status: 500 });
       }
-      
-      // Get the public URL for the uploaded file
-      const { data: urlData } = supabase
-        .storage
-        .from(STORAGE_BUCKETS.MAIN_BUCKET.split('/')[0])
-        .getPublicUrl(filePath.replace(`${STORAGE_BUCKETS.MAIN_BUCKET.split('/')[0]}/`, ''));
-      
-      payment_proof_url = urlData.publicUrl;
     }
     
     // Create payment record in Supabase
@@ -179,7 +183,7 @@ export async function POST(req: NextRequest) {
       .insert({
         booking_id,
         amount,
-        currency_code: currency || 'USD',
+        currency: currency || 'USD',  // Use 'currency' instead of 'currency_code'
         payment_method,
         status: 'pending',
         user_id,
@@ -194,7 +198,9 @@ export async function POST(req: NextRequest) {
       console.error('Failed to create payment record:', error);
       return NextResponse.json({ 
         success: false,
-        error: 'Failed to create payment record'
+        error: 'Failed to create payment record',
+        details: error.message,
+        code: error.code
       }, { status: 500 });
     }
     
